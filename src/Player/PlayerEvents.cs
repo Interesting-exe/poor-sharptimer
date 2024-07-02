@@ -71,7 +71,8 @@ namespace SharpTimer
                     if (isForBot == false) _ = Task.Run(async () => await IsPlayerATester(steamID, playerSlot));
 
                     //PlayerSettings
-                    if ((useMySQL || usePostgres) && isForBot == false) _ = Task.Run(async () => await GetPlayerStats(player, steamID, playerName, playerSlot, true));
+                    if(useMySQL && !isForBot) _ = Task.Run(async () => await mySql.GetPlayerStats(player, steamID, playerName, playerSlot, true));
+                    if(usePostgres && !isForBot) _ = Task.Run(async () => await postgreSql.GetPlayerStats(player, steamID, playerName, playerSlot, true));
 
                     if (connectMsgEnabled == true && !useMySQL && !usePostgres) Server.PrintToChatAll($" {Localizer["prefix"]} {Localizer["connect_message", player.PlayerName]}");
                     if (cmdJoinMsgEnabled == true && isForBot == false) PrintAllEnabledCommands(player);

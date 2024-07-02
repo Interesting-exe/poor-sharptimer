@@ -122,7 +122,8 @@ namespace SharpTimer
             if (useTriggers || useTriggersAndFakeZones) SharpTimerDebug($"Stopping Timer for {playerName}");
 
             if (!ignoreJSON) SavePlayerTime(player, currentTicks);
-            if (useMySQL || usePostgres) _ = Task.Run(async () => await SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, 0, playerTimer.currentStyle));
+            if(useMySQL) _ = Task.Run(async () => await mySql.SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, 0, playerTimer.currentStyle));
+            if(usePostgres) _ = Task.Run(async () => await postgreSql.SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, 0, playerTimer.currentStyle));
 
             //if (enableReplays == true) _ = Task.Run(async () => await DumpReplayToJson(player!, steamID, playerSlot));
             playerTimer.IsTimerRunning = false;
@@ -153,7 +154,8 @@ namespace SharpTimer
             }
 
             if (!ignoreJSON) SavePlayerTime(player, currentTicks, bonusX);
-            if (useMySQL || usePostgres) _ = Task.Run(async () => await SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, bonusX, playerTimers[player.Slot].currentStyle));
+            if(useMySQL) _ = Task.Run(async () => await mySql.SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, bonusX, playerTimer.currentStyle));
+            if(usePostgres) _ = Task.Run(async () => await postgreSql.SavePlayerTimeToDatabase(player, currentTicks, steamID, playerName, playerSlot, bonusX, playerTimer.currentStyle));
             //if (enableReplays == true) _ = Task.Run(async () => await DumpReplayToJson(player!, steamID, playerSlot, bonusX));
             playerTimers[player.Slot].IsBonusTimerRunning = false;
             playerTimers[player.Slot].IsRecordingReplay = false;
@@ -235,9 +237,13 @@ namespace SharpTimer
 
                     var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
                     if (playerTimers[playerSlot].CurrentMapStage == stageTrigger || playerTimers[playerSlot] == null) return;
-                    if (useMySQL || usePostgres)
+                    if (useMySQL)
                     {
-                        (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamIDFromDatabase();
+                        (srSteamID, srPlayerName, srTime) = await mySql.GetMapRecordSteamIDFromDatabase();
+                    }
+                    else if(usePostgres)
+                    {
+                        (srSteamID, srPlayerName, srTime) = await postgreSql.GetMapRecordSteamIDFromDatabase();
                     }
                     else
                     {
@@ -321,9 +327,13 @@ namespace SharpTimer
 
                     var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
                     if (playerTimers[playerSlot].CurrentMapCheckpoint == cpTrigger || playerTimers[playerSlot] == null) return;
-                    if (useMySQL || usePostgres)
+                    if (useMySQL)
                     {
-                        (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamIDFromDatabase();
+                        (srSteamID, srPlayerName, srTime) = await mySql.GetMapRecordSteamIDFromDatabase();
+                    }
+                    else if(usePostgres)
+                    {
+                        (srSteamID, srPlayerName, srTime) = await postgreSql.GetMapRecordSteamIDFromDatabase();
                     }
                     else
                     {
@@ -415,9 +425,13 @@ namespace SharpTimer
 
                     var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
                     if (playerTimers[playerSlot].CurrentMapCheckpoint == bonusCheckpointTrigger || playerTimers[playerSlot] == null) return;
-                    if (useMySQL || usePostgres)
+                    if (useMySQL)
                     {
-                        (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamIDFromDatabase();
+                        (srSteamID, srPlayerName, srTime) = await mySql.GetMapRecordSteamIDFromDatabase();
+                    }
+                    else if(usePostgres)
+                    {
+                        (srSteamID, srPlayerName, srTime) = await postgreSql.GetMapRecordSteamIDFromDatabase();
                     }
                     else
                     {

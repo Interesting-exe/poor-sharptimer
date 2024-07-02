@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 using CounterStrikeSharp.API.Modules.Entities;
+using SharpTimer.Database;
 
 namespace SharpTimer
 {
@@ -95,17 +96,9 @@ namespace SharpTimer
             {
                 Task.Run(async () =>
                 {
-                    Dictionary<string, PlayerRecord> sortedRecords;
-                    if (!useMySQL && !usePostgres)
-                    {
-                        SharpTimerDebug($"Getting Server Record AD using json");
-                        sortedRecords = await GetSortedRecords();
-                    }
-                    else
-                    {
-                        SharpTimerDebug($"Getting Server Record AD using database");
-                        sortedRecords = await GetSortedRecordsFromDatabase(100);
-                    }
+                    Dictionary<string, PlayerRecord> sortedRecords = await GetSortedRecords();
+                    if(useMySQL) sortedRecords = await mySql.GetSortedRecordsFromDatabase(100);
+                    if(usePostgres) sortedRecords = await postgreSql.GetSortedRecordsFromDatabase(100);
 
                     SharpTimerDebug($"Running Server Record AD...");
 
@@ -867,8 +860,8 @@ namespace SharpTimer
                     
                     if(!sqlCheck)
                     {
-                        if(usePostgres) _ = Task.Run(async () => await CheckPostgresTablesAsync());
-                        if(useMySQL) _ = Task.Run(async () => await CheckTablesAsync());
+                        if(usePostgres) _ = Task.Run(async () => await postgreSql.CheckTablesAsync());
+                        if(useMySQL) _ = Task.Run(async () => await mySql.CheckTablesAsync());
                         sqlCheck = true;
                     }
 

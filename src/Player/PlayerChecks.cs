@@ -103,7 +103,7 @@ namespace SharpTimer
             }
         }
 
-        async Task<string> GetTesterBigGif(string steamId64)
+        public async Task<string> GetTesterBigGif(string steamId64)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace SharpTimer
             }
         }
 
-        async Task<bool> IsSteamIDaTester(string steamId64)
+        public async Task<bool> IsSteamIDaTester(string steamId64)
         {
             try
             {

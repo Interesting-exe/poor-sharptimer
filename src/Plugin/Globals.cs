@@ -18,6 +18,7 @@ using System.Text.Json;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
+using SharpTimer.Database;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
 
 namespace SharpTimer
@@ -42,6 +43,8 @@ namespace SharpTimer
         private EntityCache? entityCache;
         public Dictionary<string, PlayerRecord>? SortedCachedRecords = [];
         private static readonly HttpClient httpClient = new();
+        public MySqlDatabase mySql;
+        public PostgreSqlDatabase postgreSql;
 
         public static JsonSerializerOptions jsonSerializerOptions = new()
         {
@@ -124,7 +127,6 @@ namespace SharpTimer
         public bool displayChatTags = true;
         public bool displayScoreboardTags = true;
         public string customVIPTag = "VIP";
-        //public string vipGifHost = "https://files.catbox.moe";
 
         public bool useTriggers = true;
         public bool useTriggersAndFakeZones = false;
@@ -219,8 +221,8 @@ namespace SharpTimer
         public bool srSoundAll = true;
 
         public string? gameDir;
-        public string? mySQLpath;
-        public string? postgresPath;
+        public static string? mySQLpath;
+        public static string? postgresPath;
         public string? PlayerStatsTable;
         public string? playerRecordsPath;
         public string? currentMapName;

@@ -302,12 +302,17 @@ namespace SharpTimer
 
                 string currentMapNamee = bonusX == 0 ? currentMapName! : $"{currentMapName}_bonus{bonusX}";
 
-                int savedPlayerTime = (useMySQL || usePostgres) ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapNamee!, playerName, style) : await GetPreviousPlayerRecord(player, steamId, bonusX, style);
+                int savedPlayerTime;
+                savedPlayerTime = await GetPreviousPlayerRecord(player, steamId, bonusX, style);
+                if(useMySQL) savedPlayerTime = await mySql.GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapNamee!, playerName, style);
+                if(usePostgres) savedPlayerTime = await postgreSql.GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapNamee!, playerName, style);
 
                 if (savedPlayerTime == 0)
                     return getRankImg ? unrankedIcon : "Unranked";
 
-                Dictionary<string, PlayerRecord> sortedRecords = (useMySQL || usePostgres) ? await GetSortedRecordsFromDatabase(0, bonusX, currentMapNamee, style) : await GetSortedRecords();
+                Dictionary<string, PlayerRecord> sortedRecords = await GetSortedRecords();
+                if(useMySQL) sortedRecords = await mySql.GetSortedRecordsFromDatabase(0, bonusX, currentMapNamee, style);
+                if(usePostgres) sortedRecords = await postgreSql.GetSortedRecordsFromDatabase(0, bonusX, currentMapNamee, style);
 
                 int placement = sortedRecords.Count(kv => kv.Value.TimerTicks < savedPlayerTime) + 1;
                 int totalPlayers = sortedRecords.Count;
@@ -329,7 +334,9 @@ namespace SharpTimer
                 if (!IsAllowedClient(player))
                     return "";
 
-                int savedPlayerPoints = (useMySQL || usePostgres) ? await GetPlayerPointsFromDatabase(player, steamId, playerName) : 0;
+                int savedPlayerPoints = 0;
+                if(useMySQL) savedPlayerPoints = await mySql.GetPlayerPointsFromDatabase(player, steamId, playerName);
+                if(usePostgres) savedPlayerPoints = await postgreSql.GetPlayerPointsFromDatabase(player, steamId, playerName);
 
                 if (getPointsOnly)
                     return savedPlayerPoints.ToString();
@@ -337,7 +344,9 @@ namespace SharpTimer
                 if (savedPlayerPoints == 0 || savedPlayerPoints <= minGlobalPointsForRank)
                     return getRankImg ? unrankedIcon : "Unranked";
 
-                Dictionary<string, PlayerPoints> sortedPoints = (useMySQL || usePostgres) ? await GetSortedPointsFromDatabase() : [];
+                Dictionary<string, PlayerPoints> sortedPoints = [];
+                if(useMySQL) sortedPoints = await mySql.GetSortedPointsFromDatabase();
+                if(usePostgres) sortedPoints = await postgreSql.GetSortedPointsFromDatabase();
 
                 int placement = sortedPoints.Count(kv => kv.Value.GlobalPoints > savedPlayerPoints) + 1;
                 int totalPlayers = sortedPoints.Count;

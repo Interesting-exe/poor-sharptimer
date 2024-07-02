@@ -23,6 +23,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using SharpTimer.Database;
 
 namespace SharpTimer
 {
@@ -31,7 +32,7 @@ namespace SharpTimer
     {
         //public required MemoryFunctionVoid<CCSPlayer_MovementServices, IntPtr> RunCommandLinux;
         //public required MemoryFunctionVoid<IntPtr, IntPtr, IntPtr, CCSPlayer_MovementServices> RunCommandWindows;
-        public required IRunCommand RunCommand;
+        public IRunCommand RunCommand;
         private int movementServices;
         private int movementPtr;
         public override void Load(bool hotReload)
@@ -48,18 +49,15 @@ namespace SharpTimer
             string recordsFileName = $"SharpTimer/PlayerRecords/";
             playerRecordsPath = Path.Join(gameDir + "/csgo/cfg", recordsFileName);
 
-            if (useMySQL)
-            {
-                string mysqlConfigFileName = "SharpTimer/mysqlConfig.json";
-                mySQLpath = Path.Join(gameDir + "/csgo/cfg", mysqlConfigFileName);
-                SharpTimerDebug($"Set mySQLpath to {mySQLpath}");
-            }
+            string mysqlConfigFileName = "SharpTimer/mysqlConfig.json";
+            mySQLpath = Path.Join(gameDir + "/csgo/cfg", mysqlConfigFileName);
+            SharpTimerDebug($"Set mySQLpath to {mySQLpath}");
+            mySql = new MySqlDatabase(mySQLpath);
 
-            if (usePostgres)
-            {
-                string postgresConfigFileName = "SharpTimer/postgresConfig.json";
-                postgresPath = Path.Join(gameDir + "/csgo/cfg", postgresConfigFileName);
-            }
+            string postgresConfigFileName = "SharpTimer/postgresConfig.json";
+            postgresPath = Path.Join(gameDir + "/csgo/cfg", postgresConfigFileName);
+            SharpTimerDebug($"Set postgresPath to {postgresPath}");
+            postgreSql = new PostgreSqlDatabase(postgresPath);
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) isLinux = true;
             else isLinux = false;

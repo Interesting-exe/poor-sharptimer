@@ -2,10 +2,7 @@ using Npgsql;
 
 namespace SharpTimer.Database
 {
-    public class PostgreSqlDatabase : Database
+    public class PostgreSqlDatabase(string dbPath) : Database(dbPath, DatabaseType.PostgreSQL)
     {
-        public PostgreSqlDatabase(string dbPath) : base(dbPath, DatabaseType.PostgreSQL)
-        {
-        }
     }
 }
